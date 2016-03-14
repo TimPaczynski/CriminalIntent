@@ -28,8 +28,10 @@ public class CrimeFragment extends Fragment {
 
     private static final String ARG_CRIME_ID = "crime_id";
     private static final String DIALOG_DATE = "DialogDate";
-
     private static final int REQUEST_DATE = 0;
+    private static final int REQUESTED = 1;
+    private static final String YES_OR_NO = "Question";
+
 
     private Crime mCrime;
     private EditText mTitleField;
@@ -118,8 +120,12 @@ public class CrimeFragment extends Fragment {
     public boolean onOptionsItemSelected( MenuItem item){
         switch(item.getItemId()){
             case R.id.menu_item_delete_crime:
-                CrimeLab.get(getActivity()).removeCrime(mCrime);
-                getActivity().finish();
+
+                android.support.v4.app.FragmentManager manager = getFragmentManager();
+                DeleteCrimeFragment dialog = DeleteCrimeFragment
+                        .newInstance(mCrime);
+                dialog.setTargetFragment(CrimeFragment.this, REQUESTED);
+                dialog.show(manager, YES_OR_NO);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -136,6 +142,14 @@ public class CrimeFragment extends Fragment {
                     .getSerializableExtra(DatePickerFragment.EXTRA_DATE);
             mCrime.setDate(date);
             updateDate();
+        }
+        if (requestCode == REQUESTED){
+            boolean delete = (boolean) data
+                    .getSerializableExtra(DeleteCrimeFragment.CRIMES_CRIME);
+            if (delete){
+                CrimeLab.get(getActivity()).removeCrime(mCrime);
+                getActivity().finish();
+            }
         }
     }
 
