@@ -21,6 +21,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -59,7 +60,8 @@ public class CrimeFragment extends Fragment {
     private Button mSuspectButton;
     private ImageButton mPhotoButton;
     private ImageView mPhotoView;
-
+    private int imageHeight;
+    private int imageWidth;
 
 
 
@@ -193,7 +195,17 @@ public class CrimeFragment extends Fragment {
 
 
         mPhotoView = (ImageView) v.findViewById(R.id.crime_photo);
-        updatePhotoView();
+        //updatePhotoView();
+        ViewTreeObserver observer = mPhotoView.getViewTreeObserver();
+        observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                imageHeight = mPhotoView.getMeasuredHeight();
+                imageWidth = mPhotoView.getMeasuredHeight();
+                updatePhotoView();
+            }
+        });
+
 
         mPhotoView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -283,9 +295,9 @@ public class CrimeFragment extends Fragment {
                 c.close();
             }
         }
-        if (requestCode == REQUESTED_PHOTO){
-            updatePhotoView();
-        }
+        //if (requestCode == REQUESTED_PHOTO){
+          //  updatePhotoView();
+        //}
     }
 
     private void updateDate(){
@@ -328,7 +340,8 @@ public class CrimeFragment extends Fragment {
             mPhotoView.setImageDrawable(null);
         }
         else {
-            Bitmap bitmap = PictureUtils.getScaledBitmap(mPhotoFile.getPath(), getActivity());
+            Bitmap bitmap = PictureUtils.getScaledBitmap(mPhotoFile.getPath(), imageWidth ,imageHeight );
+            //Bitmap bitmap = PictureUtils.getScaledBitmap(mPhotoFile.getPath(), getActivity());
             mPhotoView.setImageBitmap(bitmap);
         }
     }
